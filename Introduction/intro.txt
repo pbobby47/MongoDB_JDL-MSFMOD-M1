@@ -1,0 +1,52 @@
+=== Application: ===
+1. Presentation Layer
+2. Middleware / sever layer
+3. Database Layer 
+
+
+=== What is MongoDB ===
+1. MongoDB is a open source NoSQL Document oriented Database
+    a. Open source
+    b. NoSQL
+    c. Document oriented 
+2. MongoDB was first released in 2009 by the company 10gen.
+3. MongoDB is NoSQL Database,
+    meaning it doesn't store the data in traditional rows and columns like relational Databases(eg: sql).
+    It uses documents to store data in flexible, dynamic formats.
+
+=== Why do we need MongoDB ===
+1. When there is a need for storing a large amount of unstructured data we go for MongoDB Database.
+2. When we need a flexible, scalable and high-performance database we go for MongoDB.
+3. And also MongoDB provides Cloud based storage.
+
+
+=== ACID Properties ===
+ACID properties are the four key characteristics that define the reliability and consistency of a transaction in a Database Management System (DBMS).
+The acronym ACID stands for Atomicity, Consistency, Isolation, and Durability.
+
+Atomicity:
+    Atomicity ensures that a transaction is treated as a single, indivisible unit of work. Either all the operations within the transaction are completed successfully, or none of them are. If any part of the transaction fails, the entire transaction is rolled back to its original state, ensuring data consistency and integrity.
+
+Consistency:
+    Consistency ensures that a transaction takes the database from one consistent state to another consistent state. The database is in a consistent state both before and after the transaction is executed. Constraints, such as unique keys and foreign keys, must be maintained to ensure data consistency.
+
+Isolation: 
+    Isolation ensures that multiple transactions can execute concurrently without interfering with each other. Each transaction must be isolated from other transactions until it is completed. This isolation prevents dirty reads, non-repeatable reads, and phantom reads.
+
+Durability: 
+    Durability ensures that once a transaction is committed, its changes are permanent and will survive any subsequent system failures. The transaction’s changes are saved to the database permanently, and even if the system crashes, the changes remain intact and can be recovered.
+    
+
+=== CAP Theorem ===
+The CAP theorem established by computer scientist Eric Brewer in the early 2000s serves as a foundational principle in the area of distributed systems.
+It states that in a distributed data store,
+we can only achieve two out of three guarantees such as consistency, availability and partition tolerance.
+
+    Consistency:
+        Every user sees the same data at the same time.
+
+    Availability:
+        Every request gets a response, even if some parts of the system are down.
+
+    Partition Tolerance:
+        The system continues to work even if there are communication issues between nodes.
