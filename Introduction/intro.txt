@@ -3,7 +3,6 @@
 2. Middleware / sever layer
 3. Database Layer 
 
-
 === What is MongoDB ===
 1. MongoDB is a open source NoSQL Document oriented Database
     a. Open source
@@ -50,3 +49,30 @@ we can only achieve two out of three guarantees such as consistency, availabilit
 
     Partition Tolerance:
         The system continues to work even if there are communication issues between nodes.
+
+Excalidraw Link:  https://excalidraw.com/#json=id8nsqIuTDBV2ZiC3MQdZ,ci0QBTXomU0ygtxaA3xCcg
+
+=== SCALING ===
+    Scaling in MongoDB is a critical process that ensures a database can handle increasing data volumes, user traffic and processing demands.
+    As applications grow, maintaining optimal performance and resource utilization becomes essential.
+
+    Need of Scaling in MongoDB:
+    Scaling in MongoDB is important to meet the needs of growing applications and organizations.
+    As data volumes, user traffic, and processing requirements increase, scaling becomes important to ensure optimal performance, maintainability, and resource utilization.
+
+    Types of Scaling in MongoDB:
+
+    1. Horizontal Scaling(Scaling Down):
+    Horizontal scaling involves distributing the data across multiple servers or nodes.
+    Each server is known as shard and it is responsible for storing a portion of the data.
+    Horizontal scaling is achieved through a mechanism called sharding.
+    Sharding which involves partitioning a database into smaller and manageable pieces called shards.
+    Each shard is hosted on a separate server or replica set and together they form a sharded cluster.
+
+    2. Vertical Scaling(Scaling Up):
+    Vertical scaling include the increasing capacity of a single server by adding more CPU, RAM, or storage resources.
+    In MongoDB, it means upgrading our hardware to a more powerful machine.
+    While this approach can be effective to a certain manner, it has its limitations.
+
+    Image Link : https://miro.medium.com/v2/resize:fit:1400/format:webp/1*9OeCAJANosjqMV1_Lm6MZA.gif
+    excalidrawLink: https://excalidraw.com/#json=TXXiGfpAyBh0_UKtsuvlm,hIH5sM5ohfVFq7NF8LSOPg
