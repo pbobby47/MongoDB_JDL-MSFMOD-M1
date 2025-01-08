@@ -1,0 +1,27 @@
+>>> mongod --version:
+    To know the mongoDB version
+
+>>> mongosh
+    To connect to mongo server.
+
+>>> ctrl+c | .exit: 
+    To disconnect from mongo server.
+
+>>> cls | console.clear() :
+    To clear the screen.
+
+>>> single tab:
+    It will autofill the data.
+
+>>> double tab:
+    To know possible words / keywords
+
+>>> cd folderName:
+    To enter into child folder
+
+>>> cd ..:
+    To move back to parent folder.
+
+NOTE: 
+    mongo shell is created by JavaScript.
+    we can execute js code here.

@@ -1,0 +1,30 @@
+>>> show dbs    |   show databases:
+    To list all databases.
+
+>>> use:
+    To create new database.
+    If the database already exists it will move into database.
+    Syntax: use databaseName
+    Ex: 
+    use scott --> to create scott database
+    use hr --> to create hr database
+    use fakestoreapi --> to create fakestoreapi database
+    use dummyDB --> to create dummyDB database
+    use qspiders --> to create qspiders database
+
+>>> db:
+    It will points to the current database.
+
+>>> db.version()
+    To know the version of database.
+
+>>> db.dropDatabase()   |   db.databaseName.drop()  |   db.dropDatabase("databaseName"):
+    To delete the database
+    Ex: To delete database first we should be in the database.
+    --> to scott database:
+    1. use scott
+    2. db.dropDatabase() | db.scott.drop() | db.dropDatabase("scott")
+
+NOTE:
+    Becareful while deleting database's 
+    There is no back up for deleted database's.
