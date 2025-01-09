@@ -7,7 +7,7 @@
 >>> ctrl+c | .exit: 
     To disconnect from mongo server.
 
->>> cls | console.clear() :
+>>> cls | console.clear() : 
     To clear the screen.
 
 >>> single tab:
@@ -19,7 +19,7 @@
 >>> cd folderName:
     To enter into child folder
 
->>> cd ..:
+>>> cd .. :
     To move back to parent folder.
 
 NOTE: 
