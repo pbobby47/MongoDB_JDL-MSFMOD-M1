@@ -113,7 +113,6 @@ db.emp.insertMany([
   },
 ]);
 
-
 // ! =================== Read ===================
 // ? >>> find()
 // It will helps us to read the data.
@@ -173,20 +172,37 @@ WHERE JOB = "MANAGER"
 
 // ? Task
 // & WAQTD the details of the employees who are in dept no 20
+
 // & WAQTD the details of the employees who are in dept no 10
+
 // & WAQTD the details of the employees who are in dept no 30
+
 // & WAQTD the details of the employees who are working as clerk
+
 // & WAQTD the details of the employees who are working as analyst
+
 // & WAQTD the details of the employees who are working as salesman
+
 // & WAQTD the details of the employees whose name is Scott
+
 // & WAQTD the details of the employees whose name is Turner
+
 // & WAQTD the details of the employees who are working as clerk in dept no 20.
+
 // & WAQTD the details of the employees who are working as manager in dept no 10.
+
 // & WAQTD the details of the employees who are working as salesman in dept no 30.
+
 // & WAQTD the details of the employees who are earning 3000 as a analyst.
+
 // & WAQTD the details of the employees who are reporting to 7698.
+
 // & WAQTD the details of the employees who are reporting to 7566.
+
 // & WAQTD the details of the employees who are earning comm of 500 exactly.
+
 // & WAQTD the manager no of martin.
+
 // & WAQTD Ford's name , job and hire date
+
 // & WAQTD Jones name , employee number and his manager number along with dept no.
