@@ -206,3 +206,81 @@ WHERE JOB = "MANAGER"
 // & WAQTD Ford's name , job and hire date
 
 // & WAQTD Jones name , employee number and his manager number along with dept no.
+
+// ? >>> findOne()
+// It will helps us to read the data.
+// It will return only the first macthing data.
+// Syntax: db.collection.findOne({filter} , {projection} ,{options});
+// filter --> will pass the filtering condition to the data ---> equal where clause in SQL
+// pojection --> will display the data --> equal to select clause in SQL
+// options --> to pass additional options
+
+// & WAQTD of first matching job as manager.
+// mongodb:
+db.emp.findOne({ job: "manager" }, {}, {});
+
+// & WAQTD the name , job , sal of the employee who earns 3000.
+db.emp.findOne({ sal: 3000 }, { _id: 0, ename: 1, job: 1, sal: 1 }, {});
+db.emp.findOne({ sal: 3000 }, { _id: false, ename: 1, job: 1, sal: true }, {});
+
+// ? >>> count() method
+// It will count that no.of results sortlisted.
+
+// & WAQ to count no.of employees are present in emp collection.
+db.emp.find({}, {}, {}).count();
+
+// & WAQ to count no.of managers are present in emp collection.
+db.emp.find({ job: "manager" }, {}, {}).count();
+
+// & WAQ to count no.of clerks are present in emp collection.
+db.emp.find({ job: "clerk" }, {}, {}).count();
+
+// & WAQ to count no.of analysts are present in emp collection.
+db.emp.find({ job: "analyst" }, {}, {}).count();
+
+// & WAQ to count no.of salesman are present in emp collection.
+db.emp.find({ job: "salesman" }, {}, {}).count();
+
+// & WAQ to count no.of employee belongs to dept 10.
+// & WAQ to count no.of employee belongs to dept 20.
+// & WAQ to count no.of employee belongs to dept 30.
+// & WAQ to count no.of employee reporting to 7698.
+// & WAQ to count no.of employee reporting to 7839.
+
+// ? >>> pretty() method
+// It will display in a pretty view format.
+db.emp.find({}, {}, {});
+db.emp.find({}, {}, {}).pretty();
+// in older version of mongodb we have to use it for better view
+// now its not required.
+
+// ? >>> limit() method
+// It will limit for the no.of results.
+
+// & WAQ to display the first 5 employees details.
+db.emp.find().limit(5);
+
+// & WAQ to display the first 2 employees details.
+db.emp.find().limit(2);
+
+// & WAQ to display the first 2 employees details who belongs to dept 20.
+// & WAQ to display the first 2 employees details who belongs to dept 10.
+// & WAQ to display the first 2 employees details who belongs to dept 30.
+// & WAQ to display the first 2 employees details who are working as salesman.
+// & WAQ to display the first 2 employees details who are working as clerk.
+
+// ? >>> skip() method
+// It will skip the documents
+// & WAQTD the details of the employees excluding first 2 employees.
+db.emp.find();
+db.emp.find().skip(2);
+
+// & WAQTD the details of 2nd working employee as a manager.
+db.emp.findOne({ job: "manager" }, {}, {}).skip(1); //! WRONG
+db.emp.find({ job: "manager" }, {}, {}).skip(1).limit(1);
+
+// & all managers expect first manager
+db.emp.find({ job: "manager" }, {}, {}).skip(1);
+
+// & WAQTD the details of 3rd working employee as a clerk.
+// & WAQTD the details of 2nd employee who earns 3000.
