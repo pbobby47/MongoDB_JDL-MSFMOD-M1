@@ -1,8 +1,8 @@
 //! === Documents ===
 // ? create -----> insert(), insertOne(), insertMany()
-// ? read   -----> find() , findOne()
-// ? update
-// ? delete
+// ? read   -----> find() , findOne(), [skip , limit , count]
+// ? update -----> update(), updateOne() , updateMany() , replaceOne(), [$rename ]
+// ? delete -----> deleteOne() , delete()
 
 // ! =================== Create ===================
 // ? >>> insert():
@@ -284,3 +284,162 @@ db.emp.find({ job: "manager" }, {}, {}).skip(1);
 
 // & WAQTD the details of 3rd working employee as a clerk.
 // & WAQTD the details of 2nd employee who earns 3000.
+
+// ! =================== Update ===================
+// ? >>> update():
+// It will update only the document / documents
+// It requires atomic operators.
+// Syntax: db.collection.update( {filter} , {update} , {options});
+
+// & WAQT update the clerk salary as 1200.
+db.emp.update({ job: "clerk" }, { $set: { sal: 1000 } }, {}); // to update single docement
+db.emp.update({ job: "clerk" }, { $set: { sal: 1200 } }, { multi: false }); // to update single docement
+db.emp.update({ job: "clerk" }, { $set: { sal: 1200 } }, { multi: true }); // to update multiple docement
+
+// & WAQT update the king's manager as "Varun".
+db.emp.update({ ename: "king" }, { $set: { mgr: "varun" } }, {}); // single doc
+db.emp.update({ ename: "king" }, { $set: { mgr: "varun" } }, { multi: true }); // multi docs
+
+// & WAQT update MODI salary as 5000.
+// upsert is a combination of insert and update
+// update + insert ===> up + insert ==> upsert
+db.emp.update({ ename: "modi" }, { $set: { sal: 5000 } }, {}); //  acknowledged: true , insertedId: null,  matchedCount: 0, modifiedCount: 0, upsertedCount: 0.
+
+db.emp.update({ ename: "modi" }, { $set: { sal: 5000 } }, { upsert: true });
+
+// anyway update method is deprecated let's move into new method
+
+// ? >>> updateOne():
+// It will update only single document
+// Syntax: db.collection.updateOne({filter} , {update} , {options});
+// to update we have to use atomic operators. Ex: $set
+// multi option is required here
+
+// ? >>> updateMany()
+// It will update all the document
+// Syntax: db.collection.updateMany({filter} , {update} , {options});
+// to update we have to use atomic operators. Ex: $set
+// multi option is required here
+
+// &  WAQT update the salesman's salary as 1500 and comm as 250.
+db.emp.updateOne({ job: "salesman" }, { $set: { sal: 1500, comm: 250 } }, {});
+db.emp.updateMany({ job: "salesman" }, { $set: { sal: 1500, comm: 250 } }, {});
+
+// & WAQT update the ename as AKHIL and sal 5000 who are working as softwaredev.
+db.emp.updateOne(
+  { job: "softwaredev" },
+  { $set: { ename: "akhil", sal: 5000 } },
+  {}
+);
+
+db.emp.updateMany(
+  { job: "softwaredev" },
+  { $set: { ename: "akhil", sal: 5000 } },
+  {}
+);
+
+db.emp.updateOne(
+  { job: "softwaredev" },
+  { $set: { ename: "akhil", sal: 5000 } },
+  { upsert: true }
+);
+
+// & WAQT update the ename as varun and sal 6000 who are working as merndev.
+db.emp.updateOne(
+  { job: "merndev" },
+  { $set: { ename: "varun", sal: 6000 } },
+  { upsert: true }
+);
+
+// & WAQT update allens job as analyst
+// & WAQT update blakes mgr no as 6898
+// & WAQT update comm as 50 for all salesman's
+// & WAQT update hiredate of varun to 15 feb 2025
+// & WAQT update modi's job as PM
+// & WAQT update  all dept 10 employee's mgr to 7788
+// & WAQT update  all dept 20 employee's mgr to 6898
+// & WAQT update  all dept 30 employee's mgr to 7858
+
+// ? >>> replaceOne():
+// It will replace the current document with new document.
+// It will replace only for the first macthing doucument.
+// And we there is no replaceMany().✖️
+// syntax: db.collection.( {filter} , {replacement} , {options});
+
+// & WAQT update the miller document with new document.
+//  empno: 7934,
+//     ename: "miller",
+//     job: "clerk",
+//     mgr: 7782,
+//     hiredate: new Date("1982-01-23"),
+//     sal: 1300,
+//     comm: null,
+//     deptno: 10,
+
+db.emp.replaceOne(
+  { ename: "miller" },
+  { ename: "miller", job: "tester", mgr: 7898 },
+  {}
+);
+
+// & WAQT update the electrician document with {ename: "mohit" , job:"electrician" , sal: 5000}
+db.emp.replaceOne(
+  { job: "electrician" },
+  { ename: "mohit", job: "electrician", sal: 5000 },
+  {}
+);
+
+db.emp.replaceOne(
+  { job: "electrician" },
+  { ename: "mohit", job: "electrician", sal: 5000 },
+  { upsert: true }
+);
+
+// to update single doc --> updateOne
+// to update multi docs --> updateMany
+// to update doc with new doc --> replaceOne
+// to update filedName with newname --> rename
+
+// ? >>> $rename:
+// It will update the key names in a document.
+// It will update the field names.
+// Syntax: db.collection.updateOne({filter} , {$rename : {oldName : "newName"}}  )
+// Syntax: db.collection.updateMany({filter} , {$rename : {oldName : "newName"}}  )
+
+// & WAQT update the empno with employeeno
+db.emp.updateOne({}, { $rename: { empno: "employeeno" } });
+db.emp.updateMany({}, { $rename: { empno: "employeeno" } });
+
+// & WAQ update all salesman's sal field name as salary.
+db.emp.updateMany({ job: "salesman" }, { $rename: { sal: "slary" } });
+
+// ! =================== Delete ===================
+// ? >>> deleteOne():
+// It will delete only the first matching document.
+// Syntax: db.collection.deleteOne({filter});
+
+// ? >>> deleteMany():
+// It will delete all the matching documents.
+// Syntax: db.collection.deleteMany({filter});
+
+// & WAQT delete Jones data.
+db.emp.deleteOne({ ename: "jones" });
+
+// & WAQT delete varun data.
+db.emp.deleteOne({ ename: "varun" });
+
+// & WAQT delete the employee data who are working as "merndev".
+db.emp.deleteMany({ job: "merndev" });
+
+// & WAQT delete all the employees data who are working as clerk in dept 30.
+db.emp.deleteMany({ job: "clerk", deptno: 30 });
+
+// & WAQT delete all the employees data who are working as salesman in dept 30.
+db.emp.deleteMany({ job: "salesman", deptno: 30 });
+
+// &  WAQT delete the employees details who are reporting to 7839.
+// &  WAQT delete the employees details who are working as tester.
+// &  WAQT delete the employees details who are earning 3000.
+// &  WAQT delete the employees entire data.
+
+
