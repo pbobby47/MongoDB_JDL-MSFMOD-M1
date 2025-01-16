@@ -44,16 +44,6 @@ db.emp.find({}, {}, {});
     As Option Syntax: db.collection.find({} , {} , {limit : number});
     As method Syntax: db.collection.find({} , {} , {}).limit(number);
 
->>> max:
-    Filters documents where the field's value is less than the specified value.
-    As Option Syntax: db.collection.find({} , {} , {max : number});
-    As method Syntax: db.collection.find({} , {} , {}).max(number);
-    
->>> min:
-    Filters documents where the field's value is greater than or equal to the specified value.
-    As Option Syntax: db.collection.find({} , {} , {min : number});
-    As method Syntax: db.collection.find({} , {} , {}).min(number)
-
 >>> skip:
     Useful for pagination by skipping over a certain number of documents.
     As Option Syntax: db.collection.find({} , {} , {skip : number});
@@ -96,48 +86,6 @@ db.products.find({}, { title: 1, "rating.rate": 1 }, {});
 // & WAQTD the details of all users first name
 // & WAQTD the details of all users last name
 
-// ? Max:
-// emp data
-// & WAQTD the employees name and salary who are earning less than 1000.
-// & WAQTD the employees name and salary who are earning less than 1500.
-// & WAQTD the employees name and salary who are earning less than 5000.
-// & WAQTD the employees name, salary and sql  who are earning comm less than 800.
-
-// products data
-// & WAQTD the title and price of products where the price is less than 120.
-// & WAQTD the title and price of products where the price is less than 150.
-// & WAQTD the title and price of products where the price is less than 180.
-// & WAQTD the title and price of products where the id is less than 5.
-// & WAQTD the title and price of products where rate less than 3.
-// & WAQTD the title and price of products where rate less than 4.
-// & WAQTD the title and price of products where count is less than 120.
-// & WAQTD the title and price of products where count is less than 140.
-// & WAQTD the title and price of products where count is less than 150.
-
-// ? Min:
-// emp data
-// & WAQTD the employees name and salary who are earning more than 1000.
-// & WAQTD the employees name and salary who are earning more than 1500.
-// & WAQTD the employees name and salary who are earning more than 5000.
-// & WAQTD the employees name and salary who are earning more than 1000 and less than 3000.
-// & WAQTD the employees name and salary who are earning more than 2000 and less than 4000.
-// & WAQTD the employees name, salary and sql  who are earning comm more than 800.
-
-// products data
-// & WAQTD the title and price of products where the price is more than 120.
-// & WAQTD the title and price of products where the price is more than 150.
-// & WAQTD the title and price of products where the price is more than 180.
-// & WAQTD the title and price of products where the price is between 150 and 200.
-// & WAQTD the title and price of products where the id is more than 5.
-// & WAQTD the title and price of products where the id is between 5 and 7.
-// & WAQTD the title and price of products where rate more than 3.
-// & WAQTD the title and price of products where rate more than 4.
-// & WAQTD the title and price of products where rate between 2 and 4.
-// & WAQTD the title and price of products where count is more than 120.
-// & WAQTD the title and price of products where count is more than 140.
-// & WAQTD the title and price of products where count is more than 150.
-// & WAQTD the title and price of products where count is between 100 to 150.
-
 // ? Skip:
 // emp data
 // & WAQTD the details of employees other than first 4
@@ -175,3 +123,30 @@ db.emp.find({}, { _id: 0, ename: 1, sal: 1 }, {}).sort({ ename: -1 }); // descen
 // & Shortlist the products based on title.
 // & Shortlist the products based on category.
 
+// ! =============== Alias Name ===============
+/*Alias Name is an alternative name provided to the columns.
+SQL:
+    SELECT COLUMNNAME AS ALIASNAME FROM TABLE;
+    SELECT COLUMNNAME ALIASNAME FROM TABLE;
+
+mongodb:
+    db.collection.find({} , {aliasName : "$fieldName"} , {}); 
+
+    db.collection.find({} , {sal : 1} , {}); -- to display sal
+    db.collection.find({} , {salary : "$sal"} , {}); -- to display sal as salary
+*/
+
+// & WAQTD the name and sal of all the employees
+db.emp.find({}, { _id: 0, ename: 1, sal: 1 }, {});
+
+// & WAQTD the name, sal and wellwisher name as varun of all the employees
+db.emp.find({}, { _id: 0, ename: 1, sal: 1, wellwisher: "varun" }, {});
+
+// & WAQTD the salary  of all the employees as "salary".
+db.emp.find({}, { _id: 0, salary: "$sal" }, {});
+
+// & WAQTD ename as employeeName
+// & WAQTD hiredate as date_of_join
+// & WAQTD deptno as department
+// & WAQTD mgr as manager
+// & WAQTD comm as commision
