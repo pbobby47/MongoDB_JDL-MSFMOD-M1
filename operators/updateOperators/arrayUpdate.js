@@ -324,5 +324,37 @@ db.trainers.updateOne(
 );
 
 // & Remove "SEO" and "Content Strategy" from Amit's expertise array.
+db.trainers.updateOne(
+  {
+    trainerName: "Amit Patel",
+  },
+  {
+    $pullAll: {
+      expertise: ["SEO", "Content Strategy"],
+    },
+  }
+);
+
 // & Remove feedback scores of 5 and 4 from Anjali's feedbackScores array.
+db.trainers.updateOne(
+  {
+    trainerName: "Anjali Verma",
+  },
+  {
+    $pullAll: {
+      feedbackScores: [5, 4],
+    },
+  }
+);
+
 // & Remove all occurrences of 3 and 4 from Amit's feedbackScores array.
+db.trainers.updateOne(
+  {
+    trainerName: "Amit Patel",
+  },
+  {
+    $pullAll: {
+      feedbackScores: [3, 4],
+    },
+  }
+);
