@@ -67,6 +67,7 @@ db.emp.find({ ename: { $regex: /.*a.*m.*/ } }, { _id: 0, ename: 1 }, {});
 // & WAQTD the names of employees who contains  2 "a"'s in their names.
 db.emp.find({ ename: { $regex: /.*a.*a.*/ } }, { _id: 0, ename: 1 }, {});
 
+// & WAQTD the names of employees who contains 2 continues "l" in their names.
 // & WAQTD the names of employees who starts with "a" and ends with "s" in their names.
 // & WAQTD the names of employees who job contains "man".
 // & WAQTD the names of employees who name has exactly 4 characters.
@@ -86,7 +87,106 @@ db.emp.find({ job: { $regex: /^....$/ } }, { _id: 0, ename: 1, job: 1 }, {});
 db.emp.find({ job: { $regex: /^.{5}$/ } }, { _id: 0, ename: 1, job: 1 }, {});
 db.emp.find({ job: { $regex: /^.....$/ } }, { _id: 0, ename: 1, job: 1 }, {});
 
-// AM
-// LL
-// TT
-// AD
+// & WAQTD the employees names contains either "e" or "o"
+db.emp.find({ ename: { $regex: /[eo]/ } }); // [] --> we can mention specific characters.
+
+// & WAQTD the employees names contains vowels
+// & WAQTD the employees names contains 2 consecutive vowels
+// & WAQTD the employees names ends with "ar" or "or"
+
+// ! ================= Escape Characters ===================
+db.students.insertMany([
+  {
+    _id: 1,
+    name: "Arjun",
+    age: 18,
+    address: {
+      street: "123 College Ave",
+      city: "Anytown",
+      state: "CA",
+      zip: "12345",
+    },
+    subjects: ["Mathematics", "Physics", "Chemistry"],
+  },
+  {
+    _id: 2,
+    name: "^Ria",
+    age: 20,
+    address: {
+      street: "456 University Blvd",
+      city: "Othertown",
+      state: "NY",
+      zip: "67890",
+    },
+    subjects: ["Biology", "Chemistry", "English"],
+  },
+  {
+    _id: 3,
+    name: "$Mohan",
+    age: 22,
+    address: {
+      street: "789 Science Dr",
+      city: "Bangalore",
+      state: "KA",
+      zip: "34567",
+    },
+    subjects: ["Physics", "Mathematics", "Computer Science"],
+  },
+  {
+    _id: 4,
+    name: "Sita",
+    age: 21,
+    address: {
+      street: "101 Library Ln",
+      city: "Mumbai",
+      state: "MH",
+      zip: "23456",
+    },
+    subjects: ["Literature"],
+  },
+  {
+    _id: 5,
+    name: "Rakesh$",
+    age: 24,
+    address: {
+      street: "102 Engineering Rd",
+      city: "Chennai",
+      state: "TN",
+      zip: "56789",
+    },
+  },
+  {
+    _id: 6,
+    name: "Kiran^",
+    age: 19,
+    address: {
+      street: "103 Science Park",
+      city: "Hyderabad",
+      state: "TS",
+      zip: "65432",
+    },
+  },
+]);
+
+// to escape ^ --> \^
+// to escape $ --> \$
+// to escape . --> \.
+// to escape * --> \*
+// NOTE : by using backward slash the super power of literal will be removed and it will be consider as a character.
+
+// & WAQTD students whose names start with the literal character ^
+db.students.find({ name: { $regex: /^\^.*/ } }, { _id: 0, name: 1 }, {});
+
+// & Find students whose names end with the literal character $
+db.students.find({ name: { $regex: /.*\$$/ } }, { _id: 0, name: 1 }, {});
+// here \$ --- equal to character $
+// here $ --- equal to literal $
+
+// & Find students whose names contain the literal character ^ anywhere in the name
+db.students.find({ name: { $regex: /.*\^.*/ } }, { _id: 0, name: 1 }, {});
+
+// & Find students whose names contain the literal character $ anywhere in the name
+db.students.find({ name: { $regex: /.*\$.*/ } }, { _id: 0, name: 1 }, {});
+
+// & Find students whose names start with any character followed by ^
+db.students.find({ name: { $regex: /^.\^.*/ } }, { _id: 0, name: 1 }, {});
