@@ -394,4 +394,5 @@ db.emp.aggregate([
 // & WAQTD ename , mgrno who are reporting to 7788 or 7839.
 // & WAQTD name of employees working as clerk.
 // & WAQTD name and salary of employees working as salesman.
+
 // & WAQTD the salary of the emp who earns more than 2500.
