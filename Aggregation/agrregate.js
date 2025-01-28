@@ -394,5 +394,195 @@ db.emp.aggregate([
 // & WAQTD ename , mgrno who are reporting to 7788 or 7839.
 // & WAQTD name of employees working as clerk.
 // & WAQTD name and salary of employees working as salesman.
-
 // & WAQTD the salary of the emp who earns more than 2500.
+
+// ! ======================= $addFields ========================
+/*
+It is used to add new fields in a collection.
+It will not effect the original data in the database.
+Syntax: { $addFields : { newFiled: expression , newFiled: expression , ... } }
+
+we may think alias name and $addFields works similar, still there is a difference.
+*/
+
+// & WAQTD  the details of the employees along with annnual salary
+db.emp.aggregate([
+  {
+    $addFields: {
+      annualSal: { $multiply: ["$sal", 12] },
+    },
+  },
+]);
+
+// & WAQTD the details of the employees along with an annual sal with bonus of 2000.
+db.emp.aggregate([
+  {
+    $addFields: {
+      annualSal_bonus: {
+        $add: [{ $multiply: ["$sal", 12] }, 2000],
+      },
+    },
+  },
+]);
+
+// & WAQTD to details of salaries after an hike of 30%.
+db.emp.aggregate([
+  {
+    $addFields: {
+      sal: { $multiply: ["$sal", 1.3] },
+    },
+  },
+]);
+
+// & WAQTD the details of the employees who are earning more than 30,000 as thier annual salary.
+// alias name:
+// FROM ---> 1st
+// WHERE ----> 2nd
+// SELECT ---> 3rd
+
+db.emp.aggregate([
+  {
+    $project: {
+      ename: 1,
+      job: 1,
+      sal: 1,
+      annualSal: { $multiply: ["$sal", 12] },
+    },
+  },
+  {
+    $match: {
+      annualSal: { $gt: 30000 },
+    },
+  },
+]);
+// Here as we have only 2 stages might it works fine. But if have a lot of stages it will not work.
+
+// addFields:
+db.emp.aggregate([
+  {
+    $addFields: {
+      annualSal: { $multiply: ["$sal", 12] },
+    },
+  },
+  {
+    $match: {
+      annualSal: { $gt: 30000 },
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      sal: 1,
+      annualSal: 1,
+    },
+  },
+]);
+
+// & WAQTD the name and salary of all the employees whose name start with "a".
+db.emp.aggregate([
+  {
+    $match: {
+      ename: { $regex: /^a/ },
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      sal: 1,
+    },
+  },
+]);
+
+// & WAQTD the name and salary of all the employees whose name start with "3".
+db.emp.aggregate([
+  {
+    $addFields: {
+      salary: {
+        $toString: "$sal",
+      },
+    },
+  },
+  {
+    $match: {
+      salary: {
+        $regex: /^3/,
+      },
+    },
+  },
+  {
+    $match: {
+      ename: "ford",
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      sal: 1,
+    },
+  },
+]);
+
+// & WAQTD name and hiredate of all the employees who are hired on feb.
+// { aliasname :  { $year : "$field_name"} } --> returns year
+// { aliasname :  { $month : "$field_name"} } --> returns month
+// { aliasname :  { $dayOfMonth : "$field_name"} } --> day
+
+db.emp.aggregate([
+  {
+    $addFields: {
+      year: { $year: "$hiredate" },
+      month: { $month: "$hiredate" },
+      day: { $dayOfMonth: "$hiredate" },
+    },
+  },
+  {
+    $match: {
+      month: 2,
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      hiredate: 1,
+    },
+  },
+]);
+
+// & Q) WAQTD the all the details of an employee along with the halferly salary.
+// & Q) WAQTD all the details of the employee along with an annual bonus of 2000.
+// & Q) WAQTD the employees who receive 9600 annually.
+// & Q) WAQTD the annual salary of the employee whose name is smith.
+// & Q) WAQTD the name and sal along with annual salary if the salary is more than 12000.
+// & WAQTD the name, sal, Quarterly salary with 1000 bonus, Half Yearly Salary with 2000 bonus, yearly salary with 3000 to the employees.
+// & WAQ to add new fields of job as designation, mgr as managerRef, sal as salary with hike 30% to employee collection.
+// & Q) waqtd name and salary of all the employees whose salary start with 2
+// & waqtd name and salary of all the employees whose salary ends with 5
+// & WAQTD name and hiredate of all the employees who are hired on october.
+// & WAQTD name and hiredate of all the employees who are hired on december.
+// & WAQTD name and hiredate of all the employees who are hired on 1981.
+// & WAQTD name and hiredate of all the employees who are hired on 1987.
+// & WAQTD name and hiredate of all the employees who are hired on 20 of any month.
+// & WAQTD name and hiredate of all the employees who are hired on 10 of any month.
+// & WAQTD name and hiredate of all the employees who are hired on b/w the dates 5 to 15 of any month any year.
+// & WAQTD name and hiredate of all the employees who are hired on b/w the dates 5 to 15 of june any year.
+db.emp.aggregate([
+  {
+    $addFields: {
+      year: { $year: "$hiredate" },
+      month: { $month: "$hiredate" },
+      day: { $dayOfMonth: "$hiredate" },
+    },
+  },
+  {
+    $match: {
+      day: { $gte: 5, $lte: 15 },
+      month: 6,
+    },
+  },
+]);
+
+// & WAQTD name and hiredate of all the employees who are hired on b/w the dates 5 to 15 of any month any 1981.
