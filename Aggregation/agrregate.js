@@ -45,6 +45,7 @@ It will provide a lot more stages than the find method.
 Pipeline stages are:
         >>> $match
         >>> $project
+        >>> $addFields
         >>> $group
         >>> $match
         >>> $sort
@@ -52,7 +53,6 @@ Pipeline stages are:
         >>> $skip
         >>> $unwind
         >>> $lookup
-        >>> $addFields
 */
 
 // ! ======================= $match ========================
@@ -586,3 +586,596 @@ db.emp.aggregate([
 ]);
 
 // & WAQTD name and hiredate of all the employees who are hired on b/w the dates 5 to 15 of any month any 1981.
+
+// ! ======================= $group ========================
+/*
+It groups the documents by a specific key and allows us to perform aggregation operations like sum, avg, max, min, etc.. on grouped data.
+$group is used to group the documents.
+Whenever we group the documents it must contain _id for unique reference.
+Syntax: 
+{
+  $group: {
+    _id: "$fieldname",
+      alias_name: {$max : "$field_name"}
+      alias_name: {$min : "$field_name"}
+      alias_name: {$avg : "$field_name"}
+      alias_name: {$sum : "$field_name"}
+      alias_name: {$sum : 1}  
+    }
+} 
+
+Common $group Operations are:
+>>> $sum
+>>> $avg
+>>> $min
+>>> $max
+>>> $first
+>>> $last
+>>> $push
+>>> $addToSet
+*/
+
+// ? ============ $sum ==============
+/*
+It will perform the sum operation.
+It will accept fieldnames as value or number as value.
+Syntax: { $sum : < "$fieldName" | 1 >}
+For Ex: { $sum : "$sal" } ---> returns the total of salaries
+For Ex: { $sum : 1 } ---> returns the count of records shortlisted.
+*/
+
+// & WAQTD the totalsal of all the employees.
+db.emp.aggregate([
+  {
+    $group: {
+      total_Sal: { $sum: "$sal" },
+    },
+  },
+]);
+// MongoServerError[Location15955]: a group specification must include an _id
+
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      total_Sal: { $sum: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the totalsal, count of all the employees.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      total_Sal: { $sum: "$sal" },
+      count: { $sum: 1 },
+    },
+  },
+]);
+
+// or
+
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      total_Sal: { $sum: "$sal" },
+      count: { $count: {} },
+    },
+  },
+]);
+
+// & WAQTD the totalsal of all the employees based on each department number.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      total_Sal: { $sum: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the totalsal , count of all the employees based on each department number.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      total_Sal: { $sum: "$sal" },
+      count: { $sum: 1 },
+    },
+  },
+]);
+
+// & WAQTD the totalsal, count of all the employees who are working in dept no 10.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 10,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      total_Sal: { $sum: "$sal" },
+      count: { $sum: 1 },
+    },
+  },
+]);
+
+// & WAQTD the totalsal, count of all the employees based on each job.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$job",
+      total_Sal: { $sum: "$sal" },
+      count: { $sum: 1 },
+    },
+  },
+]);
+
+// & WAQTD the totalsal, count of all the employees who are woking as manager.
+db.emp.aggregate([
+  {
+    $match: {
+      job: "manager",
+    },
+  },
+  {
+    $group: {
+      _id: "job",
+      total_Sal: { $sum: "$sal" },
+      count: { $sum: 1 },
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      total_Sal: 1,
+      count: 1,
+    },
+  },
+]);
+
+// ? WAQTD the totalSal of all the employees.
+// ? WAQTD the count of all the employees.
+// ? WAQTD the total_Sal and count of all the employees.
+// ? WAQTD the total_Sal and count of the employees who are working dept no 10.
+// ? WAQTD the total_Sal and count of the employees who are working as manager.
+// ? WAQTD the total salary provided to each department and count of employees in each department.
+// ? WAQTD the total salary provided to each designation and count of employees in each designation.
+// ? WAQTD the total salary manager's and count of managers.
+// ? WAQTD NUMBER OF EMPLOYEES HAVING 'A' AS THEIR FIRST CHARACTER IN THEIR NAME
+// ? WAQTD no.of employees and total salary need to pay for those who hired in february.
+// ? WAQTD NUMBER OF EMPLOYEES WORKING IN EACH DEPARTMENT EXCEPT PRESIDENT
+// ? WAQTD NUMBER OF EMPLOYEES REPORTING TO 7839 (MGR)
+
+// ? ============ $avg ==============
+/*
+It will return the average value of the data. 
+Syntax: { $avg: "$fieldName" }
+*/
+
+// & WAQTD the average salary of the employees.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      averageSal: { $avg: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the average salary of the employees in each department.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      averageSal: { $avg: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the average salary of the employees who are working in deptno 10.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 10,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      averageSal: {
+        $avg: "$sal",
+      },
+    },
+  },
+]);
+
+// & WAQTD the average salary of the employees who are working in deptno 20 and 30.
+db.emp.aggregate([
+  {
+    $match: {
+      $or: [{ deptno: 20 }, { deptno: 30 }],
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      averageSal: {
+        $avg: "$sal",
+      },
+    },
+  },
+]);
+
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: { $in: [20, 30] },
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      averageSal: {
+        $avg: "$sal",
+      },
+    },
+  },
+]);
+
+// & WAQTD the average salary, total salary, count of the employees who are working "salesman".
+db.emp.aggregate([
+  {
+    $match: {
+      job: "salesman",
+    },
+  },
+  {
+    $group: {
+      _id: "$job",
+      averageSal: { $avg: "$sal" },
+      total_Sal: { $sum: "$sal" },
+      count: { $sum: 1 },
+    },
+  },
+]);
+
+// ? WAQTD the average salary of all the employees.
+// ? WAQTD the average salary of all the employees after the hike of 250 per employee.
+// ? WAQTD the average salary of all the employees in each department.
+// ? WAQTD the average salary of all the employees who are working in dept no 10.
+// ? WAQTD the average salary of all the employees who are working in dept no 20 and 30.
+// ? WAQTD the average salary of clerks.
+// ? WAQTD the average salary of managers.
+// ? WAQTD the average salary of each designation.
+// ? WAQTD the average salary of employees who are reporting to 7698.
+//? WAQTD the average comm of all the employees and no.of employees earning and total comm.
+// ? WAQTD the average salary of employees who are earning greater than or equal to 2000.
+// ? WAQTD the average salary of employees who are earning less than or equal to 2000.
+
+// ? =============== $min ===============
+/*
+It will return minimum value among all the records.
+Syntax: {$min : "$fieldName"}
+*/
+
+// & WAQTD the minimum of among all the employees.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      minimum_sal: { $min: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the minimum of among all the employees who are working as 'clerk'.
+db.emp.aggregate([
+  {
+    $match: { job: "clerk" },
+  },
+  {
+    $group: {
+      _id: "$job",
+      minimum_sal: { $min: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the minimum salary among all the employees who are working as 'managers'.
+db.emp.aggregate([
+  {
+    $match: { job: "manager" },
+  },
+  {
+    $group: {
+      _id: "$job",
+      minimum_sal: { $min: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the minimum salary amoung all the employees based on each department.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      minimum_sal: { $min: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the minimum salary amoung all the employees based on each job.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$job",
+      minimum_sal: { $min: "$sal" },
+    },
+  },
+]);
+
+// ? WAQTD the min sal among all the employees.
+// ? WAQTD the min sal among the salesman.
+// ? WAQTD the min sal among the clerks.
+// ? WAQTD the min sal among the all designation individually.
+// ? WAQTD the min sal of the employees who are working in deptno 10.
+// ? WAQTD the min sal of the employees who are working in deptno 20 or 30.
+// ? WAQTD the min sal of the employees who are working in deptno 20 as clerk.
+// ? WAQTD the min sal of the employees based on departments.
+
+// ? =============== $max ===============
+/*
+It will return maximum value among all the records.
+Syntax: {$max : "$fieldName"}
+*/
+
+// & WAQTD the maximum of among all the employees.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      maximum_sal: { $max: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the maximum of among all the employees who are working as 'clerk'.
+db.emp.aggregate([
+  {
+    $match: { job: "clerk" },
+  },
+  {
+    $group: {
+      _id: "$job",
+      maximum_sal: { $max: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the maximum salary among all the employees who are working as 'managers'.
+db.emp.aggregate([
+  {
+    $match: { job: "manager" },
+  },
+  {
+    $group: {
+      _id: "$job",
+      maximum_sal: { $max: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the maximum salary amoung all the employees based on each department.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      maximum_sal: { $max: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the maximum salary amoung all the employees based on each job.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$job",
+      maximum_sal: { $max: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the total salary, minimum salary , maximum salary , average salary , count of all the employees.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      total_Sal: { $sum: "$sal" },
+      minimum_sal: { $min: "$sal" },
+      maximum_sal: { $max: "$sal" },
+      averageSal: { $avg: "$sal" },
+      count: { $sum: 1 },
+    },
+  },
+]);
+
+// ? WAQTD the max sal among all the employees.
+// ? WAQTD the max sal among the managers.
+// ? WAQTD the max sal among the salesman.
+// ? WAQTD the max sal among the clerks.
+// ? WAQTD the max sal among the all designation individually.
+// ? WAQTD the max sal of the employees who are working in deptno 10.
+// ? WAQTD the max sal of the employees who are working in deptno 20 or 30.
+// ? WAQTD the max sal of the employees who are working in deptno 20 as clerk.
+// ? WAQTD the max sal of the employees based on departments.
+// ? WAQTD NUMBER OF EMPLOYEES GETTING SALARY LESS THAN 2000 IN DEPTNO 10
+
+// ? ============== $first ==================
+/*
+It will return the first matching document
+Syntax: 
+{
+  $group: {
+    _id: null  | anyRef,
+    aliasName : { $first : "$feildName" }
+  }
+}
+*/
+
+// & WAQTD the first employee name in the emp collection.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      firstEmp: { $first: "$ename" },
+    },
+  },
+]);
+
+// & WAQTD the first employee document in the emp collection.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      firstDoc: { $first: "$$ROOT" },
+    },
+  },
+]);
+
+// & WAQTD the first employee document in the emp collection who matches with the designation "analyst".
+db.emp.aggregate([
+  {
+    $match: {
+      job: "analyst",
+    },
+  },
+  {
+    $group: {
+      _id: null,
+      firstDoc: { $first: "$$ROOT" },
+    },
+  },
+]);
+
+db.emp.aggregate([
+  {
+    $match: {
+      job: "analyst",
+    },
+  },
+  {
+    $group: {
+      _id: "$job",
+      firstDoc: { $first: "$$ROOT" },
+    },
+  },
+]);
+
+// & WAQTD the first employee document in the emp collection based on each job.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$job",
+      firstDoc: {
+        $first: "$$ROOT",
+      },
+    },
+  },
+]);
+
+// ? WAQTD the first employee of the employee collection.
+// ? WAQTD the first employee of the employee collection who is working as manager.
+// ? WAQTD the first employee of the employee collection who is working as a salesman.
+// ? WAQTD the first employee of the employee collection who is working as a clerk.
+// ? WAQTD the first employee of the employee collection who belongs to dept no 10.
+// ? WAQTD the first employee of the employee collection who belongs to dept no 20.
+// ? WAQTD the first employee shortlist from the employee collection who joined after May 1981.
+// ? WAQTD the first employee of the employee collection who is earning more than 1500.
+// ? WAQTD the first employee of the employee collection who is earning commision.
+
+// ? ============== $last ==================
+/*
+It will return the last matching document
+Syntax: 
+{
+  $group: {
+    _id: null  | anyRef,
+    aliasName : { $last : "$feildName" }
+  }
+}
+*/
+
+// & WAQTD the last employee name in the emp collection.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      lastEmp: { $last: "$ename" },
+    },
+  },
+]);
+
+// & WAQTD the last employee document in the emp collection.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      lastDoc: { $last: "$$ROOT" },
+    },
+  },
+]);
+
+// & WAQTD the last employee document in the emp collection who matches with the designation "analyst".
+db.emp.aggregate([
+  {
+    $match: {
+      job: "analyst",
+    },
+  },
+  {
+    $group: {
+      _id: null,
+      lastDoc: { $last: "$$ROOT" },
+    },
+  },
+]);
+
+db.emp.aggregate([
+  {
+    $match: {
+      job: "analyst",
+    },
+  },
+  {
+    $group: {
+      _id: "$job",
+      lastDoc: { $last: "$$ROOT" },
+    },
+  },
+]);
+
+// & WAQTD the last employee document in the emp collection based on each job.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$job",
+      lastDoc: {
+        $last: "$$ROOT",
+      },
+    },
+  },
+]);
+
+// ? WAQTD the last employee of the employee collection.
+// ? WAQTD the last employee of the employee collection who is working as manager.
+// ? WAQTD the last employee of the employee collection who is working as a salesman.
+// ? WAQTD the last employee of the employee collection who is working as a clerk.
+// ? WAQTD the last employee of the employee collection who belongs to dept no 10.
+// ? WAQTD the last employee of the employee collection who belongs to dept no 20.
+// ? WAQTD the last employee shortlisted from the employee collection who joined after May 1981.
+// ? WAQTD the last employee of the employee collection who is earning more than 1500.
+// ? WAQTD the last employee of the employee collection who is earning commision.
