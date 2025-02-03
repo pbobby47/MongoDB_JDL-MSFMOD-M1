@@ -1179,3 +1179,252 @@ db.emp.aggregate([
 // ? WAQTD the last employee shortlisted from the employee collection who joined after May 1981.
 // ? WAQTD the last employee of the employee collection who is earning more than 1500.
 // ? WAQTD the last employee of the employee collection who is earning commision.
+
+// ? ============== $push ==================
+/*
+While we are iterating through a group, it will allows us to store the data in the array format.
+Syntax: {
+  $group: {
+        _id: "some ref",
+        aliasName : { $push : dataToPushIntoArray}
+    }
+  }
+*/
+
+// & WAQTD the names of employees who are working in deptno10.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 10,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      deptno_10_emps: { $push: "$ename" },
+    },
+  },
+]);
+
+// & WAQTD the names , jobs , salaries of employees who are working in deptno20.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 20,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      deptno_20_emps: {
+        $push: { name: "$ename", job: "$job", salary: "$sal" },
+      },
+    },
+  },
+]);
+
+// & WAQTD the names of employees who are working in any department along with theire deptno.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      employees: { $push: "$ename" },
+    },
+  },
+]);
+
+// & WAQTD the names of employees who are working manager.
+db.emp.aggregate([
+  {
+    $match: {
+      job: "manager",
+    },
+  },
+  {
+    $group: {
+      _id: "$job",
+      names: { $push: "$ename" },
+    },
+  },
+]);
+
+// & WAQTD the names of employees who are working manager , president , analyst.
+db.emp.aggregate([
+  {
+    $match: {
+      job: { $in: ["manager", "president", "analyst"] },
+    },
+  },
+  {
+    $group: {
+      _id: "$job",
+      names: { $push: "$ename" },
+    },
+  },
+]);
+
+// & WAQTD the names of employees w.r.to their jobs along with the count of employees in each jobs .
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$job",
+      names: { $push: "$ename" },
+      count: { $sum: 1 },
+      count1: { $count: {} },
+    },
+  },
+]);
+
+// & WAQTD the names , salaries , jobs of employees w.r.to their jobs along with the count of employees in each jobs .
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$job",
+      employees: { $push: { name: "$ename", salary: "$sal", job: "$job" } },
+      count: { $sum: 1 },
+    },
+  },
+]);
+
+// & WAQTD the complete details of employees w.r.to their jobs along with the count of employees in each jobs.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$job",
+      employees: { $push: "$$ROOT" },
+      count: { $sum: 1 },
+    },
+  },
+]);
+
+// & WAQTD the designations of employees in dept 10.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 10,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      designations: { $push: "$job" },
+    },
+  },
+]);
+
+// & WAQTD the designations of employees in dept 20.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 20,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      designations: { $push: "$job" },
+    },
+  },
+]);
+
+// & WAQTD the designations of employees in dept 30.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 30,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      designations: { $push: "$job" },
+    },
+  },
+]);
+
+// ? ============== $addToSet ==================
+/*
+It will act similar to $push only,
+The only difference is it maintains unique data. 
+Syntax: {
+    $group: {
+      _id: "someRef",
+      aliasName: {$addToSet: "dataToStore"}
+    }
+  }
+*/
+
+// & WAQTD the department numbers present in emp collection.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      Depts: { $push: "$deptno" },
+    },
+  },
+]);
+
+// & WAQTD the unqiue department numbers present in emp collection.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      uniquedepts: { $addToSet: "$deptno" },
+    },
+  },
+]);
+
+// & WAQTD the unqiue designation present in emp collection.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: null,
+      uniqueJobs: { $addToSet: "$job" },
+    },
+  },
+]);
+
+// & WAQTD the unique designations of employees in dept 10.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 10,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      designations: { $addToSet: "$job" },
+    },
+  },
+]);
+
+// & WAQTD the unique designations of employees in dept 20.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 20,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      designations: { $addToSet: "$job" },
+    },
+  },
+]);
+
+// & WAQTD the unique designations of employees in dept 30.
+db.emp.aggregate([
+  {
+    $match: {
+      deptno: 30,
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      designations: { $addToSet: "$job" },
+    },
+  },
+]);
