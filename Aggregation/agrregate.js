@@ -2,7 +2,7 @@
 /*!
 Aggregation allows us to perform and transform collections of documents in a flexible way.
 using Pipelines, we can perform various data manipulations, including flitering, grouping, sorting, projecting, etc.
-An aggregation pipline is a sequence of stages that process data in steps.
+An aggregation pipeline is a sequence of stages that process data in steps.
 Each stage in the pipeline performs an operation on the data.
 
 //? Syntax: 
@@ -47,6 +47,14 @@ Pipeline stages are:
         >>> $project
         >>> $addFields
         >>> $group
+              -- $sum
+              -- $min
+              -- $max
+              -- $avg
+              -- $first
+              -- $last
+              -- $push
+              -- $addToSet
         >>> $match
         >>> $sort
         >>> $limit
@@ -1425,6 +1433,664 @@ db.emp.aggregate([
     $group: {
       _id: "$deptno",
       designations: { $addToSet: "$job" },
+    },
+  },
+]);
+
+// ! =================== $match ================
+/*!
+$match will work as WHERE Clause [if we are using before grouping]
+$match will work as HAVING Clause [if we are using after grouping]
+
+
+Syntax:
+{
+  $match{
+      // condition
+      // Here it will work as where clause
+  },
+  $group{
+      // here we are using $sum, $min, $max, $avg, $first, $last, $push, $addToSet
+  },
+  $match{
+      // condition based on grouping result
+      // Here it will work as having clause
+  }
+}
+*/
+
+// & WAQTD the minimum salary of each department.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      minimum_sal: { $min: "$sal" },
+    },
+  },
+]);
+
+// & WAQTD the minimum salary of each department which earns more than 1000.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      minimum_sal: { $min: "$sal" },
+    },
+  },
+  {
+    $match: {
+      minimum_sal: { $gt: 1000 },
+    },
+  },
+]);
+
+// & WAQTD the details of avg salary of each department and average salary lies b/w 1000 and 2000.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      averageSal: { $avg: "$sal" },
+    },
+  },
+  {
+    $match: {
+      averageSal: { $gt: 1000, $lt: 2000 },
+    },
+  },
+]);
+
+// & WAQTD the department number which having 2 clerks.
+db.emp.aggregate([
+  {
+    $match: {
+      job: "clerk",
+    },
+  },
+  {
+    $group: {
+      _id: "$deptno",
+      count: { $sum: 1 },
+    },
+  },
+  {
+    $match: {
+      count: 2,
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      no_of_clerks: "$count",
+      departmentno: "$_id",
+    },
+  },
+]);
+
+// & WAQTD the no.of employees working in each department and alteast it having 4 employees.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      count: { $sum: 1 },
+    },
+  },
+  {
+    $match: {
+      count: { $gte: 4 },
+    },
+  },
+]);
+
+// & WAQTD name, job, deptno and number of emps working as managers and having atleast 2 managers in the department.
+db.emp.aggregate([
+  {
+    $match: {
+      job: "manager",
+    },
+  },
+  // It will filter managers data
+  {
+    $group: {
+      _id: "$deptno",
+      count: { $sum: 1 },
+      details: {
+        $push: {
+          name: "$ename",
+          job: "$job",
+        },
+      },
+    },
+  },
+  // It will get the count and details
+  {
+    $match: {
+      count: { $gte: 2 },
+    },
+  },
+  // It will check the count it more than or equal to 1.
+  {
+    $project: {
+      details: 1,
+      _id: 0,
+      count: 1,
+    },
+  },
+]);
+
+// It will not return any data beacause of no department having 2 or more managers .
+
+// & WAQTD the repeated salaries in emp collection.
+/*
+800 --> 1
+1600 --> 1
+1250 --> 2
+2975 --> 1
+2850 --> 1
+2450 --> 1
+3000 --> 2
+5000 --> 1
+1500 --> 1
+1100 --> 1
+950 --> 1
+1300 --> 1
+*/
+
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$sal",
+      count: { $sum: 1 },
+    },
+  },
+  {
+    $match: {
+      count: { $gt: 1 },
+    },
+  },
+]);
+
+// & WAQTD the repeated salaries in emp collection along with their details.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$sal",
+      count: { $sum: 1 },
+      details: {
+        $push: "$$ROOT",
+      },
+    },
+  },
+  {
+    $match: {
+      count: { $gt: 1 },
+    },
+  },
+]);
+
+// & WAQTD the avg salary of each department if the avg sal is less than or equal to 2500.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      averageSal: { $avg: "$sal" },
+    },
+  },
+  {
+    $match: {
+      averageSal: {
+        $lte: 2500,
+      },
+    },
+  },
+]);
+
+// & WAQTD the avg salary of each department if the avg sal is less than or equal to 2500 and include those all empnames and salaries in projection.
+db.emp.aggregate([
+  {
+    $group: {
+      _id: "$deptno",
+      averageSal: { $avg: "$sal" },
+      details: {
+        $push: {
+          name: "$ename",
+          salary: "$sal",
+        },
+      },
+    },
+  },
+  {
+    $match: {
+      averageSal: {
+        $lte: 2500,
+      },
+    },
+  },
+]);
+
+// ! ======================= $sort =======================
+/*
+  It will sort the results.
+*/
+// sort method:
+db.emp.find({}, { _id: 0, ename: 1 }).sort({ ename: 1 });
+db.emp.find({}, { _id: 0, ename: 1 }).sort({ ename: -1 });
+
+// $sort pipeline
+// & WAQTD the enames of all the employees in ascending order.
+db.emp.aggregate([
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+    },
+  },
+  {
+    $sort: {
+      ename: 1,
+    },
+  },
+]);
+
+// & WAQTD the enames of all the employees in descending order.
+db.emp.aggregate([
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+    },
+  },
+  {
+    $sort: {
+      ename: -1,
+    },
+  },
+]);
+
+// & WAQTD to shortlist the data based on salaries
+db.emp.aggregate([
+  {
+    $project: {
+      _id: 0,
+      sal: 1,
+    },
+  },
+  {
+    $sort: {
+      sal: 1,
+    },
+  },
+]);
+
+db.emp.aggregate([
+  {
+    $project: {
+      _id: 0,
+      sal: 1,
+    },
+  },
+  {
+    $sort: {
+      sal: -1,
+    },
+  },
+]);
+
+// & WAQTD the details of employess based on seniority to first.
+db.emp.aggregate([
+  {
+    $sort: {
+      hiredate: 1,
+    },
+  },
+]);
+
+// & WAQTD the details of employess based on seniority to last.
+db.emp.aggregate([
+  {
+    $sort: {
+      hiredate: -1,
+    },
+  },
+]);
+
+// ! ======================= $limit ======================
+/*
+It will limit the no.of documents while projecting the results. 
+Syntax: 
+
+db.collection.aggregate([
+        {
+            $limit: number
+        }
+])
+*/
+// & WAQTD the first employee salary among the emp collection.
+db.emp.aggregate([
+  {
+    $limit: 1,
+  },
+  {
+    $project: {
+      _id: 0,
+      sal: 1,
+    },
+  },
+]);
+
+// & WAQTD the first minimum salary among the emp collection.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: 1,
+    },
+  },
+  {
+    $limit: 1,
+  },
+]);
+
+// & WAQTD the first 4 minimum salaries among the emp collection.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: 1,
+    },
+  },
+  {
+    $limit: 4,
+  },
+  {
+    $project: {
+      _id: 0,
+      sal: 1,
+    },
+  },
+]);
+
+// & WAQTD the first 6 minimum salaries among the emp collection.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: 1,
+    },
+  },
+  {
+    $limit: 6,
+  },
+  {
+    $project: {
+      _id: 0,
+      sal: 1,
+    },
+  },
+]);
+
+// & WAQTD the first maximum salary among the emp collection.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: -1,
+    },
+  },
+  {
+    $limit: 1,
+  },
+  {
+    $project: {
+      _id: 0,
+      sal: 1,
+    },
+  },
+]);
+
+// & WAQTD the first 3 maximum salaries among the emp collection.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: -1,
+    },
+  },
+  {
+    $limit: 3,
+  },
+  {
+    $project: {
+      _id: 0,
+      sal: 1,
+    },
+  },
+]);
+
+// & WAQTD the first 5 maximum salaries among the emp collection.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: -1,
+    },
+  },
+  {
+    $limit: 5,
+  },
+  {
+    $project: {
+      _id: 0,
+      sal: 1,
+    },
+  },
+]);
+
+// ! ======================= $skip =======================
+/*
+It will skip the documents while projecting data. 
+
+Syntax: 
+db.collection.aggregate([
+  {
+    $skip: number
+  }
+])
+*/
+
+// & WAQTD the details of 2nd maximum salary earning employee.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: -1,
+    },
+  },
+  {
+    $skip: 1,
+  },
+  {
+    $limit: 1,
+  },
+]);
+
+// & WAQTD the details of 4th maximum salary earning employee.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: -1,
+    },
+  },
+  {
+    $skip: 3,
+  },
+  {
+    $limit: 1,
+  },
+]);
+
+// & WAQTD the details of 4th , 5th , 6th maximum salaries earning employee.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: -1,
+    },
+  },
+  {
+    $skip: 3,
+  },
+  {
+    $limit: 3,
+  },
+]);
+
+// & WAQTD the details of 7th maximum salary earning employee.
+// & WAQTD the details of 2nd minimum salary earning employee.
+// & WAQTD the details of 4th minimum salary earning employee.
+// & WAQTD the details of 7th minimum salary earning employee.
+
+// ! ======================== $lookup  ========================
+/*
+It is similar to JOINS in SQL.
+It helps us to get the data from multiple collections.
+Syntax: 
+
+{
+    $lookup : {
+                  from: "from collection name",
+                  foreignField: "from collection field name"
+                  localField: "current collection field name"
+                  as: "variable name"
+              }
+}
+
+*/
+
+// ! ======================== $unwind  ========================
+/*
+whenever we have object inside an array we are unable to access by dot notation.
+so we have to remove array.
+To remove array we have to use $unwind
+*/
+
+// & WAQTD the employees details along with their dept details.
+db.emp.aggregate([
+  {
+    $lookup: {
+      from: "dept",
+      foreignField: "deptno",
+      localField: "deptno",
+      as: "deptDetails",
+    },
+  },
+]);
+
+// & WAQTD the ename and dname of all the employees
+db.emp.aggregate([
+  {
+    $lookup: {
+      from: "dept",
+      foreignField: "deptno",
+      localField: "deptno",
+      as: "deptDetails",
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      "deptDetails.dname": 1,
+    },
+  },
+]);
+
+db.emp.aggregate([
+  {
+    $lookup: {
+      from: "dept",
+      foreignField: "deptno",
+      localField: "deptno",
+      as: "deptDetails",
+    },
+  },
+  {
+    $unwind: "$deptDetails",
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      dname: "$deptDetails.dname",
+    },
+  },
+]);
+
+// & WAQTD the ename , job, location of all employees.
+db.emp.aggregate([
+  {
+    $lookup: {
+      from: "dept",
+      foreignField: "deptno",
+      localField: "deptno",
+      as: "deptDetails",
+    },
+  },
+  {
+    $unwind: "$deptDetails",
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      job: 1,
+      location: "$deptDetails.loc",
+    },
+  },
+]);
+
+// & WAQTD the dname of employee who are getting 2nd maximum salary.
+db.emp.aggregate([
+  {
+    $sort: {
+      sal: -1,
+    },
+  },
+  {
+    $skip: 1,
+  },
+  {
+    $limit: 1,
+  },
+  {
+    $lookup: {
+      from: "dept",
+      foreignField: "deptno",
+      localField: "deptno",
+      as: "deptDetails",
+    },
+  },
+  {
+    $unwind: "$deptDetails",
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      department: "$deptDetails.dname",
+    },
+  },
+]);
+
+// & WAQTD the employees names along with manager names.
+db.emp.aggregate([
+  {
+    $lookup: {
+      from: "emp",
+      foreignField: "empno",
+      localField: "mgr",
+      as: "emp2Details",
+    },
+  },
+  {
+    $unwind: "$emp2Details",
+  },
+  {
+    $project: {
+      _id: 0,
+      ename: 1,
+      manager: "$emp2Details.ename",
     },
   },
 ]);
